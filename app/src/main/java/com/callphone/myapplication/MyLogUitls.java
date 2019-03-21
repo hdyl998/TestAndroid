@@ -7,7 +7,7 @@ import android.util.Log;
  */
 
 public class MyLogUitls {
-    public static void print(String s) { 
+    public static void print(String s) {
         Log.e(TAG,s);
     }
 

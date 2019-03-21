@@ -55,7 +55,7 @@ public class AppPathConfig {
     /**
      * ??????е?·??
      */
-    public static final String RootFile = BasePath+SEPARATOR+DBDirectoryName;
+    public static final String RootFile = BasePath;
     /**
      * ??????е?·??
      */

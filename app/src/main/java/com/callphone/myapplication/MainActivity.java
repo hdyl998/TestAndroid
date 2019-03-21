@@ -7,20 +7,23 @@ import android.os.Bundle;
 import android.text.format.Formatter;
 import android.widget.TextView;
 
+import java.io.Closeable;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.RandomAccessFile;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
 public class MainActivity extends AppCompatActivity {
 
 
-    String apkUrl = "http://hbxlpublics.oss-cn-shenzhen.aliyuncs.com/updates/20190316.apk";
+    String apkUrl = "http://hbxlpublics.oss-cn-shenzhen.aliyuncs.com/updates/doubleScreenVersion2_2_2.apk";
     Context mContext;
 
     Handler handler = new Handler();
-    String apkName = "apptest";
+    String apkName = "apptest.apk";
 
     TextView textView;
 
@@ -30,8 +33,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         mContext = this;
         textView = findViewById(R.id.text);
-
-
 
 
         new Thread(runnableDownload).start();
@@ -46,48 +47,100 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
+    private void setStartEnd(HttpURLConnection conn, int startPos, int endPos) {
+        conn.setRequestProperty("Range", "bytes=" + startPos + "-" + endPos);
+    }
+
+
+    public static final String FILE = "file";
+    public static final String START = "key";
+    public static final String LENGTH = "len";
+
+    boolean isFinished = false;
+
+
+    int lengthTotal = 0;
+    int sum = 0;
 
     //下载线程
     private Runnable runnableDownload = new Runnable() {
         @Override
         public void run() {
-            MyLogUitls.print("runnableDownload start");
+            MyLogUitls.print("runnableDownload start" + Thread.currentThread().getId());
+
+            FileOutputStream fos = null;
+            InputStream is = null;
             try {
                 // 获得存储卡的路径
                 java.net.URL url = new URL(apkUrl);
                 // 创建连接
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-//                conn.setRequestProperty("Connection", "close");
+                conn.setRequestProperty("Connection", "close");
 
                 MyLogUitls.print("setConnectTimeout" + conn.getConnectTimeout());
                 MyLogUitls.print("setReadTimeout" + conn.getReadTimeout());
-//                conn.setConnectTimeout(10 * 1000);
-//                conn.setReadTimeout(10 * 1000);
+
+                conn.setConnectTimeout(50 * 1000);
+                conn.setReadTimeout(50 * 1000);
+//
+
+                if (sum != 0) {
+                    setStartEnd(conn, sum, lengthTotal);
+                }
+
+
                 conn.connect();
                 // 获取文件大小
                 int length = conn.getContentLength();
+
+
+                MyLogUitls.print(length + " LEN");
+
+//               if(true){
+//                   return;
+//               }
+
+
                 String mStrTotal = Formatter.formatFileSize(mContext, Long.valueOf(length));
                 MyLogUitls.print("下载开始大小为：" + mStrTotal + "apk url:" + apkUrl + " version:");
                 // 创建输入流
-                InputStream is = conn.getInputStream();
+                is = conn.getInputStream();
                 File file = new File(AppPathConfig.RootFile);
                 // 判断文件目录是否存在
                 if (!file.exists()) {
                     file.mkdirs();
                 }
-                File apkFile = new File(AppPathConfig.RootFile, apkName + "temp");//临时文件
-                FileOutputStream fos = new FileOutputStream(apkFile);
 
-                int sum = 0;
+
+//                RandomAccessFile threadFile = new RandomAccessFile(
+//                        AppPathConfig.RootFile+ File.separator +
+//                                apkName + "temp", "rwd");
+//                threadFile.seek(startPos);
+
+
+                File apkFile = new File(AppPathConfig.RootFile, apkName + "temp");//临时文件
+
+
+                if (lengthTotal == 0) {
+                    lengthTotal = length;
+
+                    if (apkFile.exists()) {
+                        apkFile.delete();
+                    }
+                }
+
+                fos = new FileOutputStream(apkFile, true);
+
 
                 long time = System.currentTimeMillis();
                 // 缓存
-                byte buf[] = new byte[1024];
+                byte buf[] = new byte[10240];
+
                 // 写入到文件中
                 for (; ; ) {
                     int numread = is.read(buf);
                     // 计算进度条位置
-                    if (numread <= 0) {
+                    if (numread == -1) {
                         MyLogUitls.print("下载完成");
                         if (apkFile.exists()) {
                             File dest = new File(AppPathConfig.RootFile, apkName);
@@ -104,17 +157,18 @@ public class MainActivity extends AppCompatActivity {
 
                             info = "下载完成";
                             handler.post(runnable);
-
                         }
+                        isFinished = true;
                         // 下载完成
                         break;
                     }
                     // 写入文件
                     fos.write(buf, 0, numread);
                     sum += numread;
+                    fos.flush();
+                    SpUtils.putInt(FILE, START, sum);
 
-
-                    if (System.currentTimeMillis()-time  > 1000) {
+                    if (System.currentTimeMillis() - time > 1000) {
                         time = System.currentTimeMillis();
                         info = Formatter.formatFileSize(mContext, Long.valueOf(sum));
                         handler.post(runnable);
@@ -126,8 +180,26 @@ public class MainActivity extends AppCompatActivity {
             } catch (Exception e) {
                 e.printStackTrace();
 //                isUpdate = false;
+
+
+            } finally {
+                close(is);
+                close(fos);
             }
-            MyLogUitls.print("runnableDownload end");
+            if (!isFinished) {
+                new Thread(runnableDownload).start();
+            }
+            MyLogUitls.print("runnableDownload end" + Thread.currentThread().getId());
         }
     };
+
+    private void close(Closeable is) {
+        if (is != null) {
+            try {
+                is.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 }
