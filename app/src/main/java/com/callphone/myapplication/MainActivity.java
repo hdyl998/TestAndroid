@@ -166,12 +166,16 @@ public class MainActivity extends AppCompatActivity {
                     fos.write(buf, 0, numread);
                     sum += numread;
                     fos.flush();
-                    SpUtils.putInt(FILE, START, sum);
 
                     if (System.currentTimeMillis() - time > 1000) {
                         time = System.currentTimeMillis();
                         info = Formatter.formatFileSize(mContext, Long.valueOf(sum));
                         handler.post(runnable);
+                    }
+
+                    
+                    if (sum % 100000 == 0) {
+                        throw new RuntimeException("报了个错");
                     }
                 }
                 fos.flush();
