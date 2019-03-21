@@ -1,9 +1,12 @@
 package com.callphone.myapplication;
 
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.text.format.Formatter;
 import android.widget.TextView;
 
@@ -34,6 +37,12 @@ public class MainActivity extends AppCompatActivity {
         mContext = this;
         textView = findViewById(R.id.text);
 
+
+//        File dest = new File(AppPathConfig.RootFile, apkName);
+//
+//
+//
+//        installApk(mContext,dest.getPath());
 
         new Thread(runnableDownload).start();
     }
@@ -157,6 +166,9 @@ public class MainActivity extends AppCompatActivity {
 
                             info = "下载完成";
                             handler.post(runnable);
+
+                            installApk(mContext,dest.getPath());
+
                         }
                         isFinished = true;
                         // 下载完成
@@ -173,7 +185,7 @@ public class MainActivity extends AppCompatActivity {
                         handler.post(runnable);
                     }
 
-                    
+
                     if (sum % 100000 == 0) {
                         throw new RuntimeException("报了个错");
                     }
@@ -197,6 +209,17 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
+    private static void installApk(Context context, String path) {
+        if (TextUtils.isEmpty(path)) {
+            return;
+        }
+
+        Uri uri = Uri.fromFile(new File(path));
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.setDataAndType(uri, "application/vnd.android.package-archive");
+        context.startActivity(intent);
+    }
     private void close(Closeable is) {
         if (is != null) {
             try {
