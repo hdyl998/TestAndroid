@@ -10,6 +10,10 @@ import android.text.TextUtils;
 import android.text.format.Formatter;
 import android.widget.TextView;
 
+import com.callphone.test.DownFile;
+import com.callphone.test.DownTest1;
+import com.callphone.test.SiteInfo;
+
 import java.io.Closeable;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -44,7 +48,24 @@ public class MainActivity extends AppCompatActivity {
 //
 //        installApk(mContext,dest.getPath());
 
-        new Thread(runnableDownload).start();
+        new Thread(){
+            @Override
+            public void run() {
+
+                String path = AppPathConfig.BasePath;
+                String fileName="doubleScreen105.apk";
+
+                SiteInfo siteInfo = new SiteInfo("http://hbxlpublics.oss-cn-shenzhen.aliyuncs.com/updates/doubleScreen105.apk", path, fileName, 3);
+
+                DownFile downFile = new DownFile(siteInfo);
+
+                downFile.startDown();
+                installApk(mContext,path+File.separator+fileName);
+            }
+        }.start();
+
+
+//        new Thread(runnableDownload).start();
     }
 
     String info;
@@ -167,7 +188,7 @@ public class MainActivity extends AppCompatActivity {
                             info = "下载完成";
                             handler.post(runnable);
 
-                            installApk(mContext,dest.getPath());
+                            installApk(mContext, dest.getPath());
 
                         }
                         isFinished = true;
@@ -220,6 +241,7 @@ public class MainActivity extends AppCompatActivity {
         intent.setDataAndType(uri, "application/vnd.android.package-archive");
         context.startActivity(intent);
     }
+
     private void close(Closeable is) {
         if (is != null) {
             try {
