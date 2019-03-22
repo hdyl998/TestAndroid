@@ -16,6 +16,8 @@ public class FileSplitFetch implements Runnable {
 	protected boolean stop = false;     // 当前分段结束标志
 	FileUtil fileUtil = null;           // 文件工具
 
+	protected long progress;
+
 	public FileSplitFetch(String url, long startPos, long endPos, int threadID, String fileName) throws IOException {
 		super();
 		this.url = url;
@@ -41,7 +43,10 @@ public class FileSplitFetch implements Runnable {
 				byte[] b = new byte[1024];
 				int bytes = 0;
 				while((bytes = input.read(b)) > 0 && startPos < endPos && !stop){
-					startPos += fileUtil.write(b, 0, bytes);
+
+					int count=fileUtil.write(b, 0, bytes);;
+					progress+=count;
+					startPos += count;
 				}
 
 				LogUtil.log("Thread" + threadID + " is done");
@@ -54,6 +59,11 @@ public class FileSplitFetch implements Runnable {
 				e.printStackTrace();
 			} 
 		}
+	}
+
+
+	public long getProgress() {
+		return progress;
 	}
 
 	/**
