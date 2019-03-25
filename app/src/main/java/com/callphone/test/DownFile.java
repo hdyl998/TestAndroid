@@ -50,7 +50,7 @@ public class DownFile {
      * @throws IOException
      */
     public void startDown() {
-
+        LogUtil.log("startDown");
         if (firstDown) {
             fileLen = getFileSize();
             if (fileLen == -1) {
@@ -102,17 +102,13 @@ public class DownFile {
                 for (int i = 0; i < startPos.length; i++) {
                     sum += fileSplitFetchs[i].getProgress();
                 }
-                MyLogUitls.print(String.format("%.2f*100", 1f * sum / fileLen*100));
-
-
+                MyLogUitls.print(String.format("%.2f", 1f * sum / fileLen * 100));
                 for (int i = 0; i < startPos.length; i++) {
                     if (!fileSplitFetchs[i].downOver) {
                         breakWhile = false; // 还存在未下载完成的线程
                         break;
                     }
                 }
-
-
                 if (breakWhile)
                     break;
             }
