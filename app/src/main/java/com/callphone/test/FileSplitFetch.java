@@ -37,6 +37,7 @@ public class FileSplitFetch implements Runnable {
 				String prop = "bytes=" + startPos + "-";
 				httpConnection.setRequestProperty("RANGE", prop); //设置请求首部字段 RANGE
 
+
 				LogUtil.log(prop);
 
 				InputStream input = httpConnection.getInputStream(); 

@@ -12,6 +12,8 @@ import android.widget.TextView;
 
 import com.callphone.test.DownFile;
 import com.callphone.test.DownTest1;
+import com.callphone.test.FileUtil;
+import com.callphone.test.LogUtil;
 import com.callphone.test.SiteInfo;
 
 import java.io.Closeable;
@@ -21,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.RandomAccessFile;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 
 public class MainActivity extends AppCompatActivity {
@@ -48,19 +51,19 @@ public class MainActivity extends AppCompatActivity {
 //
 //        installApk(mContext,dest.getPath());
 
-        new Thread(){
+        new Thread() {
             @Override
             public void run() {
 
                 String path = AppPathConfig.BasePath;
-                String fileName="doubleScreen105.apk";
-
-                SiteInfo siteInfo = new SiteInfo("http://hbxlpublics.oss-cn-shenzhen.aliyuncs.com/updates/doubleScreen105.apk", path, fileName, 3);
-
-                DownFile downFile = new DownFile(siteInfo);
-
-                downFile.startDown();
-                installApk(mContext,path+File.separator+fileName);
+                String fileName = "doubleScreen105.apk";
+                String url = "http://hbxlpublics.oss-cn-shenzhen.aliyuncs.com/updates/test.apk";
+                try {
+                    MyThread thread = new MyThread(url, path + File.separator + fileName);
+                    thread.start();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         }.start();
 
@@ -77,10 +80,6 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
-    private void setStartEnd(HttpURLConnection conn, int startPos, int endPos) {
-        conn.setRequestProperty("Range", "bytes=" + startPos + "-" + endPos);
-    }
-
 
     public static final String FILE = "file";
     public static final String START = "key";
@@ -92,143 +91,178 @@ public class MainActivity extends AppCompatActivity {
     int lengthTotal = 0;
     int sum = 0;
 
-    //下载线程
-    private Runnable runnableDownload = new Runnable() {
+
+    public static class MyThread extends Thread {
+
+
+        protected String url;               // 文件所在url
+        protected long startPos;            // 分段传输的开始位置
+        protected long endPos;              // 结束位置
+        protected int threadID;             // 线程编号
+        protected boolean downOver = false; // 下载完成标志
+        protected boolean stop = false;     // 当前分段结束标志
+        FileUtil fileUtil = null;           // 文件工具
+
+        protected long progress;
+
+
+        private long time = System.currentTimeMillis();
+
+        public MyThread(String url, String fileName) throws IOException {
+            super();
+            this.url = url;
+            File file = null;
+            if ((file = new File(fileName)).exists()) {
+                file.delete();
+            }
+            fileUtil = new FileUtil(fileName, startPos);
+            this.fileName = fileName;
+        }
+
+        String fileName;
+
+
         @Override
         public void run() {
-            MyLogUitls.print("runnableDownload start" + Thread.currentThread().getId());
+            long curTime;
+            int loopCount = MAX_LOOP_TIME;
 
-            FileOutputStream fos = null;
-            InputStream is = null;
-            try {
-                // 获得存储卡的路径
-                java.net.URL url = new URL(apkUrl);
-                // 创建连接
-                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                conn.setRequestProperty("Connection", "close");
+            int size = getFileSize(url);
+            if (size <= 0) {
+                LogUtil.log("Error fizeSize is error"+size);
+                return;
+            }
+            startPos = 0;
+            endPos = size;
 
-                MyLogUitls.print("setConnectTimeout" + conn.getConnectTimeout());
-                MyLogUitls.print("setReadTimeout" + conn.getReadTimeout());
-
-                conn.setConnectTimeout(50 * 1000);
-                conn.setReadTimeout(50 * 1000);
-//
-
-                if (sum != 0) {
-                    setStartEnd(conn, sum, lengthTotal);
-                }
+            while (startPos < endPos && !stop) {
+                try {
+                    URL ourl = new URL(url);
+                    HttpURLConnection httpConnection = (HttpURLConnection) ourl.openConnection();
+                    String prop = "bytes=" + startPos + "-";
+                    httpConnection.setRequestProperty("RANGE", prop); //设置请求首部字段 RANGE
 
 
-                conn.connect();
-                // 获取文件大小
-                int length = conn.getContentLength();
+                    LogUtil.log(prop);
 
+                    InputStream input = httpConnection.getInputStream();
+                    byte[] b = new byte[1024];
+                    int bytes = 0;
+                    while ((bytes = input.read(b)) > 0 && startPos < endPos && !stop) {
 
-                MyLogUitls.print(length + " LEN");
-
-//               if(true){
-//                   return;
-//               }
-
-
-                String mStrTotal = Formatter.formatFileSize(mContext, Long.valueOf(length));
-                MyLogUitls.print("下载开始大小为：" + mStrTotal + "apk url:" + apkUrl + " version:");
-                // 创建输入流
-                is = conn.getInputStream();
-                File file = new File(AppPathConfig.RootFile);
-                // 判断文件目录是否存在
-                if (!file.exists()) {
-                    file.mkdirs();
-                }
-
-
-//                RandomAccessFile threadFile = new RandomAccessFile(
-//                        AppPathConfig.RootFile+ File.separator +
-//                                apkName + "temp", "rwd");
-//                threadFile.seek(startPos);
-
-
-                File apkFile = new File(AppPathConfig.RootFile, apkName + "temp");//临时文件
-
-
-                if (lengthTotal == 0) {
-                    lengthTotal = length;
-
-                    if (apkFile.exists()) {
-                        apkFile.delete();
+                        int count = fileUtil.write(b, 0, bytes);
+                        progress += count;
+                        startPos += count;
                     }
+
+                    LogUtil.log("Thread" + threadID + " is done");
+                    downOver = true;
+
+                    installApk(App.getContext(), fileName);
+
+
+                    LogUtil.log("startPos" + startPos + " endPos" + endPos);
+
+                    break;
+
+
+                } catch (MalformedURLException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                } catch (Exception e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
                 }
+                curTime = System.currentTimeMillis();
+                loopCount--;
+                if (curTime - time > MAX_WAIT_TIME || loopCount <= 0) {
+                    break;
+                }
+            }
 
-                fos = new FileOutputStream(apkFile, true);
+        }
+
+        private static final int MAX_LOOP_TIME = 50;
+
+        public static final int MAX_WAIT_TIME = 50000;
 
 
-                long time = System.currentTimeMillis();
-                // 缓存
-                byte buf[] = new byte[10240];
+        public long getProgress() {
+            return progress;
+        }
 
-                // 写入到文件中
-                for (; ; ) {
-                    int numread = is.read(buf);
-                    // 计算进度条位置
-                    if (numread == -1) {
-                        MyLogUitls.print("下载完成");
-                        if (apkFile.exists()) {
-                            File dest = new File(AppPathConfig.RootFile, apkName);
-                            if (dest.exists()) {
-                                dest.delete();
-                            }
-                            apkFile.renameTo(dest);
-//                            //存起来，已经下载了
-//                            SpUtils.putString(mContext, FILE_NAME, KEY_CONFIG_NAME, version);
-//                            //需要安装的版本
-//                            SpUtils.putString(mContext, FILE_NAME, KEY_NEED_INSTALL, version);
-//                            //安装线程
-//                            new Thread(runnableInstallApk).start();
+        /**
+         * 打印响应的头部信息
+         *
+         * @param conn
+         */
+        public void printResponseHeader(HttpURLConnection conn) {
+            for (int i = 0; ; i++) {
+                String fieldsName = conn.getHeaderFieldKey(i);
+                if (fieldsName != null) {
+                    LogUtil.log(fieldsName + ":" + conn.getHeaderField(fieldsName));
+                } else {
+                    break;
+                }
+            }
+        }
 
-                            info = "下载完成";
-                            handler.post(runnable);
+        /**
+         * 停止分段传输
+         */
+        public void setSplitTransStop() {
+            stop = true;
+        }
 
-                            installApk(mContext, dest.getPath());
+    }
 
-                        }
-                        isFinished = true;
-                        // 下载完成
+
+    private static final int NOACCESS = -2; // 文件不可访问
+
+    /**
+     * 获取文件的大小
+     *
+     * @return
+     */
+    private static int getFileSize(String htmUrl) {
+        int len = -1;
+        try {
+            URL url = new URL(htmUrl);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestProperty("User-Agent", "custom");
+
+            int respCode = connection.getResponseCode();
+            if (respCode >= 400) {
+                LogUtil.log("Error Code : " + respCode);
+                return NOACCESS; // 代表文件不可访问
+            }
+
+            String header = null;
+            for (int i = 1; ; i++) {
+                header = connection.getHeaderFieldKey(i);
+                if (header != null) {
+                    System.out.println(header);
+
+                    System.out.println(connection.getHeaderField(header));
+                    if ("Content-Length".equals(header)) {
+                        len = Integer.parseInt(connection.getHeaderField(header));
                         break;
                     }
-                    // 写入文件
-                    fos.write(buf, 0, numread);
-                    sum += numread;
-                    fos.flush();
-
-                    if (System.currentTimeMillis() - time > 1000) {
-                        time = System.currentTimeMillis();
-                        info = Formatter.formatFileSize(mContext, Long.valueOf(sum));
-                        handler.post(runnable);
-                    }
-
-
-                    if (sum % 100000 == 0) {
-                        throw new RuntimeException("报了个错");
-                    }
+                } else {
+                    break;
                 }
-                fos.flush();
-                fos.close();
-                is.close();
-            } catch (Exception e) {
-                e.printStackTrace();
-//                isUpdate = false;
-
-
-            } finally {
-                close(is);
-                close(fos);
             }
-            if (!isFinished) {
-                new Thread(runnableDownload).start();
-            }
-            MyLogUitls.print("runnableDownload end" + Thread.currentThread().getId());
+        } catch (MalformedURLException e) {
+            LogUtil.log(e.getMessage());
+            e.printStackTrace();
+        } catch (IOException e) {
+            LogUtil.log(e.getMessage());
+            e.printStackTrace();
         }
-    };
+
+        LogUtil.log("文件大小为" + len);
+        return len;
+    }
 
     private static void installApk(Context context, String path) {
         if (TextUtils.isEmpty(path)) {

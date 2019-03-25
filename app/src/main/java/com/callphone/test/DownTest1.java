@@ -11,7 +11,7 @@ public class DownTest1 {
 
         String path = "C:\\";
 
-        SiteInfo siteInfo = new SiteInfo("http://hbxlpublics.oss-cn-shenzhen.aliyuncs.com/updates/doubleScreen105.apk", path, "doubleScreen105.apk", 3);
+        SiteInfo siteInfo = new SiteInfo("http://hbxlpublics.oss-cn-shenzhen.aliyuncs.com/updates/test.apk", path, "doubleScreen105.apk", 3);
 
         DownFile downFile = new DownFile(siteInfo);
 
