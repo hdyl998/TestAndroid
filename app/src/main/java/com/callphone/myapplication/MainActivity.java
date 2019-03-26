@@ -3,25 +3,19 @@ package com.callphone.myapplication;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.text.TextUtils;
-import android.text.format.Formatter;
 import android.widget.TextView;
 
-import com.callphone.test.DownFile;
-import com.callphone.test.DownTest1;
 import com.callphone.test.FileUtil;
 import com.callphone.test.LogUtil;
-import com.callphone.test.SiteInfo;
 
 import java.io.Closeable;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.RandomAccessFile;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -81,7 +75,7 @@ public class MainActivity extends AppCompatActivity {
     };
 
 
-    public interface CallBack{
+    public interface CallBack {
 
     }
 
@@ -133,10 +127,10 @@ public class MainActivity extends AppCompatActivity {
                 try {
                     URL ourl = new URL(url);
                     HttpURLConnection httpConnection = (HttpURLConnection) ourl.openConnection();
+                    httpConnection.setConnectTimeout(10000);
+                    httpConnection.setReadTimeout(10000);
                     String prop = "bytes=" + startPos + "-";
                     httpConnection.setRequestProperty("RANGE", prop); //设置请求首部字段 RANGE
-
-
                     LogUtil.log(prop);
 
                     InputStream input = httpConnection.getInputStream();
@@ -170,6 +164,7 @@ public class MainActivity extends AppCompatActivity {
                 curTime = System.currentTimeMillis();
                 loopCount++;
 
+
                 if (curTime - time > MAX_WAIT_TIME) {
                     LogUtil.log(String.format("结束下载,超时%d 开始下载时间 %d 结束时间%d", MAX_WAIT_TIME, time, curTime));
                     break;
@@ -180,7 +175,7 @@ public class MainActivity extends AppCompatActivity {
                     break;
                 }
 
-
+                LogUtil.log("继续下载" + (curTime - time) + " loopCount " + loopCount);
             }
 
         }
@@ -255,7 +250,7 @@ public class MainActivity extends AppCompatActivity {
         } catch (MalformedURLException e) {
             LogUtil.log(e.getMessage());
             e.printStackTrace();
-        } catch (IOException e) {
+        } catch (Exception e) {
             LogUtil.log(e.getMessage());
             e.printStackTrace();
         }
