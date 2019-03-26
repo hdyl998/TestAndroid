@@ -182,7 +182,7 @@ public class MainActivity extends AppCompatActivity {
 
         private static final int MAX_LOOP_TIME = 50;
 
-        public static final int MAX_WAIT_TIME = 50000;
+        public static final int MAX_WAIT_TIME = 500000;
 
 
         public long getProgress() {
