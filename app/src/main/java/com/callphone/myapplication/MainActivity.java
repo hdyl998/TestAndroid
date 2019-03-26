@@ -81,15 +81,9 @@ public class MainActivity extends AppCompatActivity {
     };
 
 
-    public static final String FILE = "file";
-    public static final String START = "key";
-    public static final String LENGTH = "len";
+    public interface CallBack{
 
-    boolean isFinished = false;
-
-
-    int lengthTotal = 0;
-    int sum = 0;
+    }
 
 
     public static class MyThread extends Thread {
@@ -125,11 +119,11 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void run() {
             long curTime;
-            int loopCount = MAX_LOOP_TIME;
+            int loopCount = 0;
 
             int size = getFileSize(url);
             if (size <= 0) {
-                LogUtil.log("Error fizeSize is error"+size);
+                LogUtil.log("Error fizeSize is error" + size);
                 return;
             }
             startPos = 0;
@@ -174,10 +168,19 @@ public class MainActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
                 curTime = System.currentTimeMillis();
-                loopCount--;
-                if (curTime - time > MAX_WAIT_TIME || loopCount <= 0) {
+                loopCount++;
+
+                if (curTime - time > MAX_WAIT_TIME) {
+                    LogUtil.log(String.format("结束下载,超时%d 开始下载时间 %d 结束时间%d", MAX_WAIT_TIME, time, curTime));
                     break;
                 }
+
+                if (loopCount > MAX_LOOP_TIME) {
+                    LogUtil.log(String.format("结束下载,循环次数%d", loopCount));
+                    break;
+                }
+
+
             }
 
         }
@@ -241,9 +244,6 @@ public class MainActivity extends AppCompatActivity {
             for (int i = 1; ; i++) {
                 header = connection.getHeaderFieldKey(i);
                 if (header != null) {
-                    System.out.println(header);
-
-                    System.out.println(connection.getHeaderField(header));
                     if ("Content-Length".equals(header)) {
                         len = Integer.parseInt(connection.getHeaderField(header));
                         break;
