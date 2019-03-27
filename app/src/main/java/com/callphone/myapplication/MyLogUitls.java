@@ -11,5 +11,9 @@ public class MyLogUitls {
         Log.e(TAG,s);
     }
 
+    public static void print(String tag,String s) {
+        Log.e(tag,s);
+    }
+
     private static final String TAG = "MyLogUitls";
 }
