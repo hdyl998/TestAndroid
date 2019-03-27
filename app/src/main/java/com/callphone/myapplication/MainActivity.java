@@ -14,7 +14,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.RandomAccessFile;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 
 public class MainActivity extends AppCompatActivity {
@@ -188,6 +187,7 @@ public class MainActivity extends AppCompatActivity {
             String failDesc = null;
             int length = 0;
             while (loopCount < MAX_NORMAL_RETRY_TIME) {
+                progress = 0;
                 InputStream is = null;
                 FileOutputStream fos = null;
                 try {
@@ -234,9 +234,7 @@ public class MainActivity extends AppCompatActivity {
                         }
                         // 写入文件
                         fos.write(buf, 0, numread);
-
                         progress += numread;
-
                         if (System.currentTimeMillis() - recordTime > 500) {
                             recordTime = System.currentTimeMillis();
                             MyLogUitls.print(TAG, String.format("progress %.2f 当前%d 总%d", 100f * progress / endPos, progress, endPos));
