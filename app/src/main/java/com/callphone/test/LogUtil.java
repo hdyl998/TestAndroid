@@ -1,5 +1,7 @@
 package com.callphone.test;
 
+import com.callphone.myapplication.MyLogUitls;
+
 public class LogUtil {
 
 	public static void sleep(int second) {
@@ -12,7 +14,7 @@ public class LogUtil {
 	}
 
 	public static void log(String msg) {
-		System.out.println(msg);
+		MyLogUitls.print(msg);
 	}
 
 	public static void log(int msg) {
