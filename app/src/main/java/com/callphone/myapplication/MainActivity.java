@@ -315,7 +315,7 @@ public class MainActivity extends AppCompatActivity {
                 } catch (Exception e) {
                     e.printStackTrace();
                 } finally {
-                    UpdateUtils.close(input, fileUtil);
+                    UpdateUtils.close(input);
                 }
                 curTime = System.currentTimeMillis();
                 loopCount++;
@@ -329,6 +329,8 @@ public class MainActivity extends AppCompatActivity {
                 }
                 MyLogUitls.print("继续下载 已耗时(秒)" + ((curTime - time) / 1000) + " loopCount " + loopCount);
             }
+            //关闭文件读写
+            UpdateUtils.close(fileUtil);
             int costSeconds = (int) ((System.currentTimeMillis() - time) / 1000);
             DownLoadInfo downLoadInfo = new DownLoadInfo(endPos, aimFile.length(), costSeconds, loopCount);
             downLoadInfo.setXuchuan(true);
