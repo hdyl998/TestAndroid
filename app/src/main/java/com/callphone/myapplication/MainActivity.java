@@ -67,12 +67,12 @@ public class MainActivity extends AppCompatActivity {
 
     /**
      * 获取url的文件的大小
-     * 大于0表示正常 0为未知,小于0表示错误
+     * -2表示错误 -1为未知
      *
      * @return
      */
     public static long getUrlFileSize(String htmUrl) {
-        long len = 0;
+        long len = -2;
         try {
             URL url = new URL(htmUrl);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -81,7 +81,7 @@ public class MainActivity extends AppCompatActivity {
             int respCode = connection.getResponseCode();
             if (respCode >= 400) {
                 MyLogUitls.print("Error Code : " + respCode);
-                return -2; // 代表文件不可访问
+                return len; // 代表文件不可访问
             }
             len = connection.getContentLength();
 
