@@ -1,0 +1,16 @@
+package com.callphone.myapplication;
+
+import android.util.Log;
+
+/**
+ * Note：None
+ * Created by Liuguodong on 2019/4/25 17:42
+ * E-Mail Address：986850427@qq.com
+ */
+class LogUitls {
+
+
+    public static void print(String onReceivedError, String s) {
+        Log.e(onReceivedError,s);
+    }
+}

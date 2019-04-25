@@ -6,9 +6,9 @@
     android:layout_height="match_parent"
     tools:context="com.callphone.myapplication.MainActivity">
 
-    <TextView
+    <com.callphone.myapplication.MyWebView
+        android:id="@+id/webView"
         android:layout_width="match_parent"
-        android:id="@+id/text"
-        android:layout_height="wrap_content" />
+        android:layout_height="match_parent"/>
 
 </RelativeLayout>
