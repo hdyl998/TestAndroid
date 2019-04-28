@@ -6,35 +6,24 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Region;
-import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.View;
 
-
-import android.content.Context;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.Path;
-import android.graphics.Region;
-import android.util.AttributeSet;
-import android.view.View;
-
-public class TestView extends View{
+public class ClipPathView extends View{
     Context mContext;
     Paint mPaint;
     Path mPath;
-    public TestView(Context context) {
+    public ClipPathView(Context context) {
         super(context);
         init();
     }
 
-    public TestView(Context context, AttributeSet attrs) {
+    public ClipPathView(Context context, AttributeSet attrs) {
         super(context, attrs);
         init();
     }
 
-    public TestView(Context context, AttributeSet attrs, int defStyle) {
+    public ClipPathView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
         init();
     }
