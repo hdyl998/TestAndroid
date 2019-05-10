@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="5dp">
+
+
+    <EditText
+        android:id="@+id/textViewIp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="输入IP地址"
+      />
+
+
+    <EditText
+        android:id="@+id/textViewPort"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="输入端口号"
+ />
+
+
+    <CheckBox
+        android:id="@+id/checkBox"
+        android:text="启用代理(杀进程重启app生效)"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+
+
+</LinearLayout>

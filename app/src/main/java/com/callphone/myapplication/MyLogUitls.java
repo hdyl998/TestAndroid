@@ -8,10 +8,19 @@ import android.util.Log;
 
 public class MyLogUitls {
     public static void print(String s) {
+
+        if(s==null){
+            s="empty";
+        }
         Log.e(TAG,s);
     }
 
     public static void print(String tag,String s) {
+        if(s==null){
+            s="empty";
+        }
+
+
         Log.e(tag,s);
     }
 

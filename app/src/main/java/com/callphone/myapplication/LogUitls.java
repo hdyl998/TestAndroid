@@ -11,6 +11,9 @@ class LogUitls {
 
 
     public static void print(String onReceivedError, String s) {
+        if(s==null){
+            s="empty";
+        }
         Log.e(onReceivedError,s);
     }
 }
