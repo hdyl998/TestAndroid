@@ -3,6 +3,7 @@ package com.callphone.myapplication;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.TextView;
 
@@ -13,12 +14,17 @@ public class MainActivity extends AppCompatActivity {
 
     TextView textView;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
 
+
+        super.onCreate(savedInstanceState);
+        setTheme(R.style.dialogThemeBase);
+        setContentView(R.layout.activity_main);
         textView = findViewById(R.id.textView);
+
+        getWindow().setGravity(Gravity.RIGHT);
     }
 
 
