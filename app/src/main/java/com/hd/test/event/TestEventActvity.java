@@ -7,7 +7,7 @@ import android.support.v4.app.FragmentActivity;
 import com.hd.R;
 
 /**
- * Note：None
+ * Note：https://www.cnblogs.com/fuly550871915/p/4983682.html
  * Created by Liuguodong on 2019/7/24 10:47
  * E-Mail Address：986850427@qq.com
  */

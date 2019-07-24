@@ -35,8 +35,9 @@ public class MyView extends View {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-
-        Log.d("付勇焜---->", "MyView onTouchEvent ");
-        return super.onTouchEvent(event);
+        Log.d("付勇焜---->", "MyView onTouchEvent "+event.getAction());
+        boolean isTouch= super.onTouchEvent(event);
+        Log.d("付勇焜---->", "MyView onTouchEvent "+isTouch);
+        return isTouch;
     }
 }
