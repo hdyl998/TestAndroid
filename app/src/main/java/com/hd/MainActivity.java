@@ -10,6 +10,7 @@ import android.widget.Button;
 import com.hd.lib.bufferknife.MyBindView;
 import com.hd.lib.bufferknife.MyBufferKnifeUtils;
 import com.hd.lib.bufferknife.MyOnClick;
+import com.hd.test.aidl.AidlMain2Activity;
 import com.hd.test.event.TestEventActvity;
 import com.hd.test.mutitask.AidlMainActivity;
 
@@ -32,13 +33,11 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
     Button button4;//Button4
     @MyBindView(R.id.button5)
     Button button5;//Button5
-    int a;//MyBufferKnifeUtils.inject(this);//加上这句话,防止忘记,没生效
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         MyBufferKnifeUtils.inject(this);
 
     }
@@ -54,6 +53,7 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
                 startActivity(new Intent(this, AidlMainActivity.class));
                 break;
             case R.id.button3:
+                startActivity(new Intent(this, AidlMain2Activity.class));
                 break;
             case R.id.button4:
                 break;

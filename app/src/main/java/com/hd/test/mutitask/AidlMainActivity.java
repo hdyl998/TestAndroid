@@ -7,7 +7,6 @@ import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.RemoteException;
-import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentActivity;
 import android.widget.Toast;
 
@@ -16,7 +15,8 @@ import com.hd.app.MyLogUitls;
 
 import java.util.List;
 
-/**https://blog.csdn.net/huagjie/article/details/80463785
+/**
+ * https://blog.csdn.net/songjinshi/article/details/22918405
  * Note：None
  * Created by Liuguodong on 2019/7/24 11:46
  * E-Mail Address：986850427@qq.com
@@ -24,27 +24,32 @@ import java.util.List;
 public class AidlMainActivity extends FragmentActivity {
 
     private static final String TAG = "AidlMainActivity";
+    private ServiceConnection connection;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_aidl);
 
 
-        ServiceConnection connection = new ServiceConnection() {
+        connection = new ServiceConnection() {
             @Override
             public void onServiceConnected(ComponentName name, IBinder service) {
-
-                MyLogUitls.print(TAG,(service instanceof BookManager)+"");
-
+                MyLogUitls.print(TAG, (service instanceof BookManager) + "");
                 BookManager bookManager = BookManager.Stub.asInterface(service);
-
                 try {
                     List<Book> bookList = bookManager.getBookList();
-
                     Toast.makeText(getApplicationContext(), "来自服务端的数据" + bookList.toString(), Toast.LENGTH_SHORT).show();
                 } catch (RemoteException e) {
                     e.printStackTrace();
                 }
+                try {
+                    bookManager.register(mCallback);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+
             }
 
             @Override
@@ -56,5 +61,19 @@ public class AidlMainActivity extends FragmentActivity {
         Intent intent = new Intent(this, AidlService.class);
 
         bindService(intent, connection, Context.BIND_AUTO_CREATE);
+    }
+
+    private DataCallBack mCallback = new DataCallBack.Stub() {
+
+        @Override
+        public void callBack(Book data) throws RemoteException {
+            MyLogUitls.print(TAG, "来自服务端的数据" + data.toString());
+        }
+    };
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unbindService(connection);
     }
 }

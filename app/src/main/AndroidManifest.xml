@@ -38,6 +38,14 @@
         </service>
         <activity android:name=".test.mutitask.AidlMainActivity">
         </activity>
+        <activity android:name=".test.aidl.AidlMain2Activity">
+        </activity>
+
+        <service android:name=".test.aidl.MyService"
+            android:process=":test2"
+            ></service>
+
+
 
 
     </application>
