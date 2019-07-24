@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.callphone.myapplication">
+    package="com.hd">
+
     <uses-permission android:name="android.permission.INTERNET" />
     <!-- 文件写入SD卡权限 -->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
@@ -9,26 +10,33 @@
     <uses-permission android:name="android.permission.WAKE_LOCK" />
 
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
+
     <application
+        android:name="com.hd.app.App"
         android:allowBackup="true"
-        android:name=".App"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
-        <activity android:name="com.callphone.org.howe.keyboardpanelswitcher.MainKeyBoardActivity" >
+        <activity android:name="com.hd.org.howe.keyboardpanelswitcher.MainKeyBoardActivity">
+
+        </activity>
+
+        <activity android:name="com.hd.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <activity
-            android:name=".MainActivity"
-            >
-
+        <activity android:name=".test.event.TestEventActvity">
+        </activity>
+        <service
+            android:name=".test.mutitask.AidlService"
+            android:process=":test">
+        </service>
+        <activity android:name=".test.mutitask.AidlMainActivity">
         </activity>
 
 
