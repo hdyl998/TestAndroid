@@ -45,7 +45,22 @@
             android:process=":test2"
             ></service>
 
+        <activity
+            android:name=".test.noname.MainViewPagerActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+        </activity>
+        <activity
+            android:name=".test.noname.ScrollingActivity"
+            android:label="@string/title_activity_scrolling"
+            android:theme="@style/AppTheme.NoActionBar">
 
+
+
+        </activity>
+        <activity android:name=".test.noname.MainTabActivity">
+
+
+        </activity>
 
 
     </application>

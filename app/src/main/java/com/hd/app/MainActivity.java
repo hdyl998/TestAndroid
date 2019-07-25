@@ -22,7 +22,7 @@ public class MainActivity extends AppCompatActivity {
 
         super.onCreate(savedInstanceState);
         setTheme(R.style.dialogThemeBase);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_main_home);
 
         getWindow().setGravity(Gravity.RIGHT);
     }
@@ -75,7 +75,7 @@ public class MainActivity extends AppCompatActivity {
         Utils.killSelfAndRestart(this);
     }
 
-    private static final String TAG = "MainActivity";
+    private static final String TAG = "MainTabActivity";
 
 
 }
