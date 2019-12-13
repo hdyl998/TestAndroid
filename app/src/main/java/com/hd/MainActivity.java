@@ -45,6 +45,7 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
         dataItems.add(new MenuItem(TestEventActvity.class, "事件"));
         dataItems.add(new MenuItem(AidlMainActivity.class, "Aidl"));
         dataItems.add(new MenuItem(AidlMain2Activity.class, "Aidl2"));
+        dataItems.add(new MenuItem(Main2Activity.class,"test2"));
     }
 
     List<MenuItem> dataItems = new ArrayList<>();
